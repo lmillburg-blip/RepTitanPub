@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="RepTitan">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <title>RepTitan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --border: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--bg-secondary);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* Top Bar Info */
+        .top-status-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .status-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .status-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Alarm Toggle switch styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Notification Banners */
+        .banner {
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 500;
+            font-size: 14px;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .banner-warning {
+            background-color: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--accent-warning);
+            color: #fcd34d;
+        }
+
+        .banner-danger {
+            background-color: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-danger);
+            color: #fca5a5;
+        }
+
+        /* Section Containers */
+        .panel {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        /* Generic Lock button styling */
+        .btn-lock {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-lock.locked {
+            background-color: rgba(59, 130, 246, 0.2);
+            border-color: var(--accent);
+            color: #93c5fd;
+        }
+
+        /* Workouts & Metrics Layout */
+        .workout-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .workout-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .inputs-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .inputs-group label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        input[type="number"] {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px;
+            border-radius: 6px;
+            width: 65px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        input[type="number"]:disabled {
+            opacity: 0.6;
+            background-color: rgba(0,0,0,0.2);
+        }
+
+        .analytics-pill {
+            font-size: 12px;
+            background-color: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Checklists */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-success);
+            cursor: pointer;
+        }
+
+        /* Rest Day Block button */
+        .rest-toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        /* Stopwatch UI Component */
+        .stopwatch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--bg-primary);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stopwatch-time {
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .stopwatch-actions button {
+            background-color: var(--accent);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .stopwatch-actions button.btn-reset {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+        }
+
+        /* Custom Water Adder */
+        .water-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-water {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Health Tip Box */
+        .tip-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .tip-title {
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 4px;
+        }
+
+        /* Academic Block Focus Timer styling */
+        .academic-timer-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 8px;
+        }
+
+        /* Summary Box layout rules */
+        .summary-box {
+            background-color: var(--bg-secondary);
+            border: 2px dashed var(--border);
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .btn-summary-toggle {
+            background-color: var(--accent);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .summary-stats {
+            display: none;
+            margin-top: 14px;
+            text-align: left;
+            background-color: var(--bg-primary);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .summary-stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+
+        .summary-stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .disclaimer-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tabs Header Navigation -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchDay('Mon')">Mon</button>
+        <button class="tab-btn" onclick="switchDay('Tue')">Tue</button>
+        <button class="tab-btn" onclick="switchDay('Wed')">Wed</button>
+        <button class="tab-btn" onclick="switchDay('Thu')">Thu</button>
+        <button class="tab-btn" onclick="switchDay('Fri')">Fri</button>
+        <button class="tab-btn" onclick="switchDay('Sat')">Sat</button>
+        <button class="tab-btn" onclick="switchDay('Sun')">Sun</button>
+    </div>
+
+    <!-- Top Status Bar (Streak & Alarm) -->
+    <div class="top-status-bar">
+        <div class="status-card">
+            <span class="status-label">🔥 Consistency Streak</span>
+            <span class="status-value" id="streak-counter">0 Days</span>
+        </div>
+        <div class="status-card">
+            <span class="status-label">⏰ 5:30 AM reminder preference (no device alarm)</span>
+            <label class="switch">
+                <input type="checkbox" id="alarm-toggle" onchange="toggleAlarm()">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <section class="panel" style="padding:16px;margin:14px 0;">
+      <strong>📅 Training history</strong>
+      <p style="font-size:13px;color:var(--text-secondary)">Your entries save on this device. Archive a completed week to keep your history and start fresh.</p>
+      <button type="button" onclick="archiveWeek()" style="padding:10px;border-radius:8px;background:#2563eb;color:white;border:0;cursor:pointer">Mark New Week Complete</button>
+      <button type="button" onclick="exportData()" style="padding:10px;border-radius:8px;background:#334155;color:white;border:0;cursor:pointer">Export Backup</button>
+      <div id="archive-history" style="margin-top:10px;font-size:13px"></div>
+    </section>
+    <!-- Condition Risk Safeguard Banners -->
+    <div id="sleep-warning-banner" class="banner banner-warning">
+        <strong>⚠️ Performance Safety Banner: Low Recovery Detected</strong>
+        <span>Logged less than 7 hours of rest. Prioritize joint mobility, drink fluids as needed, and consider a lighter workout today.</span>
+    </div>
+
+    <div id="injury-risk-banner" class="banner banner-danger">
+        <strong>⚠️ Recovery Check-In</strong>
+        <span>You reported low sleep and soreness. Consider rest or lighter activity, and talk to a trusted adult or clinician about concerning pain.</span>
+    </div>
+
+    <!-- SPORTS WORKOUT DRILLS PANEL (Directly under top bar markers) -->
+    <div class="panel" id="sports-panel">
+        <div class="panel-title">
+            <span id="sports-panel-title">Active Training Block</span>
+            <button class="btn-lock" id="rep-lock-btn" onclick="toggleRepLock()">Lock Target Reps</button>
+        </div>
+        <div id="sports-drills-container" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Rendered Dynamically based on the selected Tab -->
+        </div>
+    </div>
+
+    <!-- DAILY CORE STABILITY CIRCUIT -->
+    <div class="panel" id="core-panel">
+        <div class="panel-title">🎯 Daily Core Stability Circuit</div>
+        <div id="core-circuit-container" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Rendered Dynamically based on the selected Tab -->
+        </div>
+    </div>
+
+    <!-- WELLNESS CENTER PANEL -->
+    <div class="panel">
+        <div class="panel-title">🩺 Health & Wellness Center</div>
+        
+        <div class="rest-toggle-container">
+            <span style="font-size: 14px; font-weight: 600;">⚠️ Extreme Muscle/Joint Soreness?</span>
+            <label class="checkbox-item">
+                <input type="checkbox" id="rest-day-toggle" onchange="toggleRestDay()"> Take a Rest Day
+            </label>
+        </div>
+
+        <div class="workout-row">
+            <div class="workout-header">
+                <span>💤 Last Night's Sleep</span>
+                <span class="analytics-pill" id="sleep-status-pill">Empty</span>
+            </div>
+            <div class="inputs-group">
+                <label>Hours Slept:</label>
+                <input type="number" id="sleep-hours-input" step="0.5" placeholder="0" min="0" max="24" oninput="updateSleepData()">
+            </div>
+        </div>
+
+        <div class="workout-row">
+            <div class="workout-header">
+                <span>💧 Fluid Hydration Log</span>
+                <span class="analytics-pill" id="water-total-label">0 / 100 oz</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <div class="water-controls">
+                    <button class="btn-water" onclick="addWater(8)">+8 oz Cup</button>
+                    <button class="btn-water" onclick="addWater(24)">+24 oz Bottle</button>
+                </div>
+                <label class="checkbox-item" id="electrolyte-reminder" style="display: none; background-color: rgba(59, 130, 246, 0.15); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--accent); color: #60a5fa;">
+                    <input type="checkbox" id="electrolyte-check"> Taken Electrolytes ⚡
+                </label>
+            </div>
+        </div>
+
+        <div class="tip-box">
+            <div class="tip-title">💡 Today's Longevity & Recovery Tip</div>
+            <div id="daily-health-tip">Select a active training day to generate a health tip vector context.</div>
+        </div>
+    </div>
+
+    <!-- SINGLE UNIFIED ACADEMIC PANEL (Anchored at the bottom) -->
+    <div class="panel">
+        <div class="panel-title">📚 Unified Academic & Mental Conditioning</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label class="checkbox-item">
+                <input type="checkbox" id="acad-task-1"> Homework Checklist Complete
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" id="acad-task-2"> Active Reading Assignment / Project Prep Complete
+            </label>
+            <label class="checkbox-item">
+                <input type="checkbox" id="acad-task-3"> Weekly Planner & Organization Check
+            </label>
+        </div>
+        <div class="academic-timer-box">
+            <div>
+                <span style="font-size: 14px; font-weight: 600; display: block;">⏱️ Study Focus Pomodoro</span>
+                <span style="font-size: 12px; color: var(--text-secondary);">Target: 25-Min Intervals</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="stopwatch-time" id="acad-timer-display">25:00</span>
+                <div class="stopwatch-actions">
+                    <button id="btn-acad-start" onclick="toggleAcademicTimer()">Start</button>
+                    <button class="btn-reset" onclick="resetAcademicTimer()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUNDAY ONLY EXCLUSIVE WEEKLY COMPILATION PANEL -->
+    <div class="summary-box" id="sunday-summary-panel" style="display: none;">
+        <h3>📊 Weekly Performance Metrics Analytics</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 6px 0 12px 0;">Calculates rolling week efficiency after Saturday's training cycle closes.</p>
+        <button class="btn-summary-toggle" id="summary-toggle-btn" onclick="toggleSummaryMetrics()">Unlock Weekly Summary</button>
+        <div class="summary-stats" id="summary-stats-box">
+            <div class="summary-stat-row">
+                <span>Rolling Sleep Average:</span>
+                <span id="avg-sleep-val">0.0 hrs</span>
+            </div>
+            <div class="summary-stat-row">
+                <span>Avg Daily Hydration:</span>
+                <span id="avg-water-val">0 oz</span>
+            </div>
+            <div class="summary-stat-row">
+                <span>Football Center Execution Rate:</span>
+                <span id="summary-fb-rate">-</span>
+            </div>
+            <div class="summary-stat-row">
+                <span>Baseball Cage Contact Efficiency:</span>
+                <span id="summary-bb-rate">-</span>
+            </div>
+            <div class="summary-stat-row">
+                <span>Basketball PF Free Throw Success:</span>
+                <span id="summary-bk-rate">-</span>
+            </div>
+            <div class="summary-stat-row">
+                <span>Soccer Forward Finish Success Rate:</span>
+                <span id="summary-sc-rate">-</span>
+            </div>
+            <div class="summary-stat-row">
+                <span>Best 1-Mile Running Time:</span>
+                <span id="summary-mile-pb">--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <p class="disclaimer-text">This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.</p>
+
+    <!-- APPLICATION LOGIC & STATE HANDLING ENGINE -->
+    <script>
+        // CLEAN SLATE DATABASE STATE
+        let activeDay = 'Mon';
+        let targetsLocked = false;
+        let streakCount = 0;
+        let isAlarmActive = false;
+
+        // Data Storage Engine isolated by Calendar Day (Ensuring clean boundaries)
+        let appDb = {
+            Mon: { sports: 'Football & Baseball', sleep: null, water: 0, electrolytes: false, isRestDay: false, fbCompleted: '', fbTarget: 50, bbCompleted: '', bbTarget: 50, fbDashTime: null, coreChecked: [false, false] },
+            Tue: { sports: 'Basketball & Soccer', sleep: null, water: 0, electrolytes: false, isRestDay: false, bkMakes: '', bkTries: '', scMakes: '', scTries: '', coreChecked: [false, false] },
+            Wed: { sports: 'Football & Baseball', sleep: null, water: 0, electrolytes: false, isRestDay: false, fbCompleted: '', fbTarget: 50, bbCompleted: '', bbTarget: 50, fbDashTime: null, coreChecked: [false, false] },
+            Thu: { sports: 'Basketball & Soccer', sleep: null, water: 0, electrolytes: false, isRestDay: false, bkMakes: '', bkTries: '', scMakes: '', scTries: '', coreChecked: [false, false] },
+            Fri: { sports: 'Football & Baseball', sleep: null, water: 0, electrolytes: false, isRestDay: false, fbCompleted: '', fbTarget: 50, bbCompleted: '', bbTarget: 50, fbDashTime: null, coreChecked: [false, false] },
+            Sat: { sports: 'Basketball & Soccer', sleep: null, water: 0, electrolytes: false, isRestDay: false, bkMakes: '', bkTries: '', scMakes: '', scTries: '', coreChecked: [false, false] },
+            Sun: { sports: 'Running Focus', sleep: null, water: 0, electrolytes: false, isRestDay: false, runTime: null, coreChecked: [false, false] }
+        };
+
+        // Personal Bests Engine
+        let best40YardDash = null;
+        let bestMileRun = null;
+
+        const STORAGE_KEY = 'reptitan-v1';
+        let archivedWeeks = [];
+        const blankWeek = JSON.parse(JSON.stringify(appDb));
+        function loadSavedData() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+            if (!saved || saved.version !== 1) return;
+            for (const day of Object.keys(blankWeek)) {
+              if (saved.days && saved.days[day]) appDb[day] = {...blankWeek[day], ...saved.days[day]};
+            }
+            archivedWeeks = Array.isArray(saved.archives) ? saved.archives : [];
+            best40YardDash = typeof saved.best40 === 'number' ? saved.best40 : null;
+            bestMileRun = typeof saved.bestMile === 'number' ? saved.bestMile : null;
+          } catch (error) { console.warn('Unable to load saved training data', error); }
+        }
+        function saveData() {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({version:1, days:appDb, archives:archivedWeeks, best40:best40YardDash, bestMile:bestMileRun}));
+          } catch (error) { console.warn('Unable to save training data', error); }
+        }
+        function renderArchives() {
+          const target = document.getElementById('archive-history');
+          if (!target) return;
+          target.textContent = archivedWeeks.length ? `${archivedWeeks.length} completed week(s) archived. Most recent: ${archivedWeeks[archivedWeeks.length-1].completedAt.slice(0,10)}.` : 'No weeks archived yet.';
+        }
+        function archiveWeek() {
+          if (!confirm('Archive this week and clear the daily entries? A backup is recommended first.')) return;
+          archivedWeeks.push({completedAt:new Date().toISOString(), days:JSON.parse(JSON.stringify(appDb))});
+          appDb = JSON.parse(JSON.stringify(blankWeek));
+          saveData(); renderActiveDay(); calculateStreaks(); renderArchives();
+          alert('Week archived. Your personal bests and completed weeks are retained on this device.');
+        }
+        function exportData() {
+          saveData();
+          const blob = new Blob([localStorage.getItem(STORAGE_KEY) || '{}'], {type:'application/json'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href=url; a.download='reptitan-backup.json'; a.click();
+          setTimeout(()=>URL.revokeObjectURL(url),1000);
+        }
+        // Dynamic Health Science Tips Content Rotator
+        const healthTips = {
+            Mon: { title: "Overuse Rotator Cuff Protection", text: "Repetitive baseball hitting swings and football snaps stress the anterior shoulder. Execute internal/external rotation band work pre-drill." },
+            Tue: { title: "Ankle Inversion Injury Prevention", text: "Basketball post drops and soccer cutting forces place load on lateral ankle ligaments. Work single-leg balance routines." },
+            Wed: { title: "Posterior Chain Force Loading", text: "Football stance compression demands elite hamstring/glute mechanics. Incorporate dynamic bridge configurations into warm-ups." },
+            Thu: { title: "Reactive Hydration Optimization", text: "Soccer forwards hit maximum aerobic strain. Drink continuous fluids containing optimal sodium parameters to avoid mid-cut fatigue spikes." },
+            Fri: { title: "Thoracic Spine Mobility", text: "Batting metrics rely on rotary kinetic power. Prioritize foam roller extensions to unlock additional compression free-swing vectors." },
+            Sat: { title: "CNS Recovery Protocols", text: "Nearing week-end cycles requires aggressive neural recovery. Dedicate five minutes post-session to box breathing schemas." },
+            Sun: { title: "Aerobic Threshold Adaptation", text: "The steady 1-mile tempo run builds continuous capillary density. Target smooth breathing rhythms over erratic, short high-strain bursts." }
+        };
+
+        // 40-Yard Dash Timer State
+        let dashTimerInterval = null;
+        let dashTimeElapsed = 0;
+
+        // Mile Timer State
+        let mileTimerInterval = null;
+        let mileTimeElapsed = 0;
+
+        // Pomodoro Focus Timer State
+        let acadTimerInterval = null;
+        let acadTimeSeconds = 1500;
+
+        // Tab Switching Handler Engine
+        function switchDay(day) {
+            activeDay = day;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText === day) btn.classList.add('active');
+            });
+            
+            // Adjust Sunday specific analytics card visibility
+            const summaryPanel = document.getElementById('sunday-summary-panel');
+            summaryPanel.style.display = (day === 'Sun') ? 'block' : 'none';
+
+            // Refresh day rendering pipeline
+            renderActiveDay();
+            calculateStreaks();
+        }
+
+        function toggleAlarm() {
+            isAlarmActive = document.getElementById('alarm-toggle').checked;
+        }
+
+        function toggleRepLock() {
+            targetsLocked = !targetsLocked;
+            const btn = document.getElementById('rep-lock-btn');
+            if (targetsLocked) {
+                btn.innerText = "🔒 Targets Locked";
+                btn.classList.add('locked');
+            } else {
+                btn.innerText = "Lock Target Reps";
+                btn.classList.remove('locked');
+            }
+            renderActiveDay();
+        }
+
+        function toggleRestDay() {
+            const isChecked = document.getElementById('rest-day-toggle').checked;
+            appDb[activeDay].isRestDay = isChecked;
+            renderActiveDay();
+            checkWarnings();
+        }
+
+        function updateSleepData() {
+            const value = parseFloat(document.getElementById('sleep-hours-input').value);
+            appDb[activeDay].sleep = isNaN(value) || value < 0 ? null : value;
+            
+            const pill = document.getElementById('sleep-status-pill');
+            if (appDb[activeDay].sleep === null) {
+                pill.innerText = "Empty";
+                pill.style.backgroundColor = 'var(--bg-tertiary)';
+            } else {
+                pill.innerText = appDb[activeDay].sleep + " Hours";
+                pill.style.backgroundColor = appDb[activeDay].sleep < 7 ? 'var(--accent-danger)' : 'var(--accent-success)';
+            }
+            checkWarnings();
+        }
+
+        function addWater(amount) {
+            appDb[activeDay].water += amount;
+            document.getElementById('water-total-label').innerText = appDb[activeDay].water + " / 100 oz";
+            calculateStreaks();
+        }
+
+        function checkWarnings() {
+            const sleepVal = appDb[activeDay].sleep;
+            const isSore = appDb[activeDay].isRestDay;
+            
+            const sleepWarning = document.getElementById('sleep-warning-banner');
+            const injuryWarning = document.getElementById('injury-risk-banner');
+            const electroRemind = document.getElementById('electrolyte-reminder');
+
+            // Reset visibility
+            sleepWarning.style.display = 'none';
+            injuryWarning.style.display = 'none';
+            electroRemind.style.display = 'none';
+
+            if (sleepVal !== null && sleepVal < 7) {
+                if (isSore) {
+                    injuryWarning.style.display = 'flex';
+                } else {
+                    sleepWarning.style.display = 'flex';
+                }
+            }
+
+            // Electrolyte reminder rules: triggered on heavy/sore days
+            if (isSore || (activeDay === 'Sun') || (sleepVal !== null && sleepVal < 7)) {
+                electroRemind.style.display = 'flex';
+            }
+        }
+
+        // DYNAMIC DAY RENDERING PIPELINE
+        function renderActiveDay() {
+            const currentData = appDb[activeDay];
+            
+            // Sync core infrastructure fields
+            document.getElementById('rest-day-toggle').checked = currentData.isRestDay;
+            document.getElementById('sleep-hours-input').value = currentData.sleep === null ? '' : currentData.sleep;
+            document.getElementById('water-total-label').innerText = currentData.water + " / 100 oz";
+            document.getElementById('electrolyte-check').checked = currentData.electrolytes;
+            
+            const pill = document.getElementById('sleep-status-pill');
+            if (currentData.sleep === null) {
+                pill.innerText = "Empty";
+                pill.style.backgroundColor = 'var(--bg-tertiary)';
+            } else {
+                pill.innerText = currentData.sleep + " Hours";
+                pill.style.backgroundColor = currentData.sleep < 7 ? 'var(--accent-danger)' : 'var(--accent-success)';
+            }
+
+            // Load Custom Tip
+            document.getElementById('daily-health-tip').innerText = healthTips[activeDay].text;
+
+            // Load Sports Panel Target Elements
+            document.getElementById('sports-panel-title').innerText = "🏈 Training: " + currentData.sports;
+            
+            const sportsContainer = document.getElementById('sports-drills-container');
+            sportsContainer.innerHTML = '';
+
+            const coreContainer = document.getElementById('core-circuit-container');
+            coreContainer.innerHTML = '';
+
+            checkWarnings();
+
+            if (currentData.isRestDay) {
+                sportsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 12px; color: var(--accent-success); font-weight:600;">
+                        🟢 Rest & Muscle Recovery Mode Active.<br>
+                        <span style="font-size:12px; color: var(--text-secondary); font-weight:400;">High performance sports drills locked out to protect joint structural safety.</span>
+                    </div>
+                    <div class="workout-row">
+                        <strong style="font-size:14px; color:#60a5fa;">🛠️ Substitute Active Recovery Tasks:</strong>
+                        <div style="display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+                            <label class="checkbox-item"><input type="checkbox"> 15-Mins Foam Rolling & Soft Tissue Work</label>
+                            <label class="checkbox-item"><input type="checkbox"> Static Hamstring & Hip Flexor Decompression</label>
+                        </div>
+                    </div>
+                `;
+                return; // Suppress normal blocks
+            }
+
+            // Populate specific drills matching scheduled day layout
+            if (activeDay === 'Mon' || activeDay === 'Wed' || activeDay === 'Fri') {
+                // Football (Center) & Baseball
+                sportsContainer.innerHTML = `
+                    <div class="workout-row">
+                        <div class="workout-header">
+                            <span>🏈 Football (Center): Snaps & Steps Drills</span>
+                            <span class="analytics-pill" id="fb-perc-pill">0% Complete</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                            <div class="inputs-group">
+                                <label>Target:</label>
+                                <input type="number" id="fb-target" value="${currentData.fbTarget}" ${targetsLocked ? 'disabled' : ''} oninput="syncSportInputs()">
+                            </div>
+                            <div class="inputs-group">
+                                <label>Reps Completed:</label>
+                                <input type="number" id="fb-completed" value="${currentData.fbCompleted}" oninput="syncSportInputs()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="workout-row">
+                        <div class="workout-header">
+                            <span>⚾ Baseball: Batting Cage Swings (Clean Hits)</span>
+                            <span class="analytics-pill" id="bb-perc-pill">0% Accuracy</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                            <div class="inputs-group">
+                                <label>Total Swings:</label>
+                                <input type="number" id="bb-target" value="${currentData.bbTarget}" ${targetsLocked ? 'disabled' : ''} oninput="syncSportInputs()">
+                            </div>
+                            <div class="inputs-group">
+                                <label>Clean Hits Matrix:</label>
+                                <input type="number" id="bb-completed" value="${currentData.bbCompleted}" oninput="syncSportInputs()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="workout-row">
+                        <div class="workout-header">
+                            <span>🏈 Football Speed: 40-Yard Dash Stopwatch</span>
+                            <span class="analytics-pill" style="background-color: var(--accent-warning);">PB Record: ${best40YardDash ? best40YardDash+'s' : 'None'}</span>
+                        </div>
+                        <div class="stopwatch-container" style="margin-top:6px;">
+                            <span class="stopwatch-time" id="dash-timer-display">0.00s</span>
+                            <div class="stopwatch-actions">
+                                <button id="btn-dash-start" onclick="toggleDashTimer()">Start Sprint</button>
+                                <button class="btn-reset" onclick="resetDashTimer()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                coreContainer.innerHTML = `
+                    <label class="checkbox-item"><input type="checkbox" ${currentData.coreChecked[0] ? 'checked':''} onchange="toggleCoreCheck(0)"> Core Block 1: Front Plank Iso-Hold (3 Sets x 60s)</label>
+                    <label class="checkbox-item"><input type="checkbox" ${currentData.coreChecked[1] ? 'checked':''} onchange="toggleCoreCheck(1)"> Core Block 2: Weighted Russian Rotational Twists (3 Sets x 20 Reps)</label>
+                `;
+                syncSportInputs();
+
+            } else if (activeDay === 'Tue' || activeDay === 'Thu' || activeDay === 'Sat') {
+                // Basketball (Power Forward) & Soccer (Forward)
+                sportsContainer.innerHTML = `
+                    <div class="workout-row">
+                        <div class="workout-header">
+                            <span>🏀 Basketball (PF): Free Throw Mechanics</span>
+                            <span class="analytics-pill" id="bk-perc-pill">0% Makes</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                            <div class="inputs-group">
+                                <label>Total Takes:</label>
+                                <input type="number" id="bk-tries" value="${currentData.bkTries}" oninput="syncSportInputs()">
+                            </div>
+                            <div class="inputs-group">
+                                <label>Total Makes:</label>
+                                <input type="number" id="bk-makes" value="${currentData.bkMakes}" oninput="syncSportInputs()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="workout-row">
+                        <div class="workout-header">
+                            <span>⚽ Soccer (Forward): Striking & Finishing</span>
+                            <span class="analytics-pill" id="sc-perc-pill">0% Finish Rate</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                            <div class="inputs-group">
+                                <label>Total Shots:</label>
+                                <input type="number" id="sc-tries" value="${currentData.scTries}" oninput="syncSportInputs()">
+                            </div>
+                            <div class="inputs-group">
+                                <label>Goals Converted:</label>
+                                <input type="number" id="sc-makes" value="${currentData.scMakes}" oninput="syncSportInputs()">
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                coreContainer.innerHTML = `
+                    <label class="checkbox-item"><input type="checkbox" ${currentData.coreChecked[0] ? 'checked':''} onchange="toggleCoreCheck(0)"> Core Block 1: Supine Hanging Leg Raises (3 Sets x 15 Reps)</label>
+                    <label class="checkbox-item"><input type="checkbox" ${currentData.coreChecked[1] ? 'checked':''} onchange="toggleCoreCheck(1)"> Core Block 2: Alternating Contralateral Deadbugs (3 Sets x 12 Reps)</label>
+                `;
+                syncSportInputs();
+
+            } else if (activeDay === 'Sun') {
+                // Running conditioning day
+                sportsContainer.innerHTML = `
+                    <div class="workout-row">
+                        <div class="workout-header">
+                            <span>🏃‍♂️ Conditioning Focus: 1-Mile Speed Tempo Run</span>
+                            <span class="analytics-pill" style="background-color: var(--accent-success);">Current PB: ${bestMileRun ? formatTime(bestMileRun) : '--:--'}</span>
+                        </div>
+                        <div class="stopwatch-container" style="margin-top:8px;">
+                            <span class="stopwatch-time" id="mile-timer-display">00:00</span>
+                            <div class="stopwatch-actions">
+                                <button id="btn-mile-start" onclick="toggleMileTimer()">Start Run</button>
+                                <button class="btn-reset" onclick="resetMileTimer()">Reset / Lock Time</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                coreContainer.innerHTML = `
+                    <label class="checkbox-item"><input type="checkbox" ${currentData.coreChecked[0] ? 'checked':''} onchange="toggleCoreCheck(0)"> Core Block 1: Quadruped Bird-Dogs stability metrics (3 Sets x 12 Reps)</label>
+                    <label class="checkbox-item"><input type="checkbox" ${currentData.coreChecked[1] ? 'checked':''} onchange="toggleCoreCheck(1)"> Core Block 2: Explosive High-Pace Mountain Climbers (3 Sets x 30s)</label>
+                `;
+            }
+        }
+
+        function toggleCoreCheck(idx) {
+            appDb[activeDay].coreChecked[idx] = !appDb[activeDay].coreChecked[idx];
+            calculateStreaks();
+        }
+
+        // Live calculation engine for percentages (rounded avoiding decimals)
+        function syncSportInputs() {
+            const currentData = appDb[activeDay];
+            
+            if (activeDay === 'Mon' || activeDay === 'Wed' || activeDay === 'Fri') {
+                const fbT = parseInt(document.getElementById('fb-target').value) || 0;
+                const fbC = parseInt(document.getElementById('fb-completed').value) || 0;
+                currentData.fbTarget = fbT;
+                currentData.fbCompleted = fbC;
+                
+                const fbPill = document.getElementById('fb-perc-pill');
+                if (fbT > 0) {
+                    const pct = Math.round((fbC / fbT) * 100);
+                    fbPill.innerText = pct + "% Complete";
+                }
+
+                const bbT = parseInt(document.getElementById('bb-target').value) || 0;
+                const bbC = parseInt(document.getElementById('bb-completed').value) || 0;
+                currentData.bbTarget = bbT;
+                currentData.bbCompleted = bbC;
+
+                const bbPill = document.getElementById('bb-perc-pill');
+                if (bbT > 0) {
+                    const pct = Math.round((bbC / bbT) * 100);
+                    bbPill.innerText = pct + "% Contact Efficiency";
+                }
+            } else if (activeDay === 'Tue' || activeDay === 'Thu' || activeDay === 'Sat') {
+                const bkT = parseInt(document.getElementById('bk-tries').value) || 0;
+                const bkM = parseInt(document.getElementById('bk-makes').value) || 0;
+                currentData.bkTries = bkT;
+                currentData.bkMakes = bkM;
+
+                const bkPill = document.getElementById('bk-perc-pill');
+                if (bkT > 0) {
+                    bkPill.innerText = Math.round((bkM / bkT) * 100) + "% Makes";
+                }
+
+                const scT = parseInt(document.getElementById('sc-tries').value) || 0;
+                const scM = parseInt(document.getElementById('sc-makes').value) || 0;
+                currentData.scTries = scT;
+                currentData.scMakes = scM;
+
+                const scPill = document.getElementById('sc-perc-pill');
+                if (scT > 0) {
+                    scPill.innerText = Math.round((scM / scT) * 100) + "% Finish Rate";
+                }
+            }
+            calculateStreaks();
+        }
+
+        // STOPWATCH SYSTEM ENG: 40-Yard Dash
+        function toggleDashTimer() {
+            const btn = document.getElementById('btn-dash-start');
+            if (dashTimerInterval) {
+                clearInterval(dashTimerInterval);
+                dashTimerInterval = null;
+                btn.innerText = "Start Sprint";
+                
+                // Track PB
+                const recorded = parseFloat((dashTimeElapsed / 100).toFixed(2));
+                if (best40YardDash === null || recorded < best40YardDash) {
+                    best40YardDash = recorded;
+                }
+                renderActiveDay();
+            } else {
+                btn.innerText = "Stop / Save";
+                dashTimerInterval = setInterval(() => {
+                    dashTimeElapsed++;
+                    document.getElementById('dash-timer-display').innerText = (dashTimeElapsed / 100).toFixed(2) + 's';
+                }, 10);
+            }
+        }
+
+        function resetDashTimer() {
+            if(dashTimerInterval) clearInterval(dashTimerInterval);
+            dashTimerInterval = null;
+            dashTimeElapsed = 0;
+            document.getElementById('dash-timer-display').innerText = "0.00s";
+            document.getElementById('btn-dash-start').innerText = "Start Sprint";
+        }
+
+        // STOPWATCH SYSTEM ENG: 1-Mile
+        function toggleMileTimer() {
+            const btn = document.getElementById('btn-mile-start');
+            if (mileTimerInterval) {
+                clearInterval(mileTimerInterval);
+                mileTimerInterval = null;
+                btn.innerText = "Start Run";
+                
+                if (bestMileRun === null || mileTimeElapsed < bestMileRun) {
+                    bestMileRun = mileTimeElapsed;
+                }
+                renderActiveDay();
+            } else {
+                btn.innerText = "Stop / Save";
+                mileTimerInterval = setInterval(() => {
+                    mileTimeElapsed++;
+                    document.getElementById('mile-timer-display').innerText = formatTime(mileTimeElapsed);
+                }, 1000);
+            }
+        }
+
+        function resetMileTimer() {
+            if(mileTimerInterval) clearInterval(mileTimerInterval);
+            mileTimerInterval = null;
+            mileTimeElapsed = 0;
+            document.getElementById('mile-timer-display').innerText = "00:00";
+            document.getElementById('btn-mile-start').innerText = "Start Run";
+        }
+
+        function formatTime(totalSeconds) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+
+        // POMODORO FOCUS TIMER ENGINE
+        function toggleAcademicTimer() {
+            const btn = document.getElementById('btn-acad-start');
+            if (acadTimerInterval) {
+                clearInterval(acadTimerInterval);
+                acadTimerInterval = null;
+                btn.innerText = "Start";
+            } else {
+                btn.innerText = "Pause";
+                acadTimerInterval = setInterval(() => {
+                    if (acadTimeSeconds > 0) {
+                        acadTimeSeconds--;
+                        const mins = Math.floor(acadTimeSeconds / 60);
+                        const secs = acadTimeSeconds % 60;
+                        document.getElementById('acad-timer-display').innerText = 
+                            (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+                    } else {
+                        clearInterval(acadTimerInterval);
+                        acadTimerInterval = null;
+                        btn.innerText = "Done";
+                        alert("Academic study focus interval closed! Perfect mental conditioning work.");
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetAcademicTimer() {
+            if(acadTimerInterval) clearInterval(acadTimerInterval);
+            acadTimerInterval = null;
+            acadTimeSeconds = 1500;
+            document.getElementById('acad-timer-display').innerText = "25:00";
+            document.getElementById('btn-acad-start').innerText = "Start";
+        }
+
+        // SUMMARY METRICS TOGGLER (Sunday Exclusive)
+        function toggleSummaryMetrics() {
+            const statsBox = document.getElementById('summary-stats-box');
+            const toggleBtn = document.getElementById('summary-toggle-btn');
+            
+            if (statsBox.style.display === 'block') {
+                statsBox.style.display = 'none';
+                toggleBtn.innerText = "Unlock Weekly Summary";
+            } else {
+                // Compile real rolling database calculations
+                let totalSleep = 0, sleepDays = 0;
+                let totalWater = 0;
+                let fbRepTotal = 0, fbTargetTotal = 0;
+                let bbHitTotal = 0, bbSwingTotal = 0;
+                let bkMadeTotal = 0, bkTriedTotal = 0;
+                let scMadeTotal = 0, scTriedTotal = 0;
+
+                Object.keys(appDb).forEach(d => {
+                    const dayData = appDb[d];
+                    if(dayData.sleep !== null) { totalSleep += dayData.sleep; sleepDays++; }
+                    totalWater += dayData.water;
+
+                    if(d === 'Mon' || d === 'Wed' || d === 'Fri') {
+                        fbRepTotal += dayData.fbCompleted; fbTargetTotal += dayData.fbTarget;
+                        bbHitTotal += dayData.bbCompleted; bbSwingTotal += dayData.bbTarget;
+                    }
+                    if(d === 'Tue' || d === 'Thu' || d === 'Sat') {
+                        bkMadeTotal += dayData.bkMakes; bkTriedTotal += dayData.bkTries;
+                        scMadeTotal += dayData.scMakes; scTriedTotal += dayData.scTries;
+                    }
+                });
+
+                document.getElementById('avg-sleep-val').innerText = sleepDays > 0 ? (totalSleep / sleepDays).toFixed(1) + " hrs" : "0.0 hrs";
+                document.getElementById('avg-water-val').innerText = Math.round(totalWater / 7) + " oz/day";
+                
+                document.getElementById('summary-fb-rate').innerText = fbTargetTotal > 0 ? Math.round((fbRepTotal / fbTargetTotal)*100) + "% Completion" : "No Reps Input";
+                document.getElementById('summary-bb-rate').innerText = bbSwingTotal > 0 ? Math.round((bbHitTotal / bbSwingTotal)*100) + "% Hits" : "No Reps Input";
+                document.getElementById('summary-bk-rate').innerText = bkTriedTotal > 0 ? Math.round((bkMadeTotal / bkTriedTotal)*100) + "% Accuracy" : "No Reps Input";
+                document.getElementById('summary-sc-rate').innerText = scTriedTotal > 0 ? Math.round((scMadeTotal / scTriedTotal)*100) + "% Success" : "No Reps Input";
+                document.getElementById('summary-mile-pb').innerText = bestMileRun ? formatTime(bestMileRun) : "No Time Set";
+
+                statsBox.style.display = 'block';
+                toggleBtn.innerText = "Hide Weekly Summary";
+            }
+        }
+
+        // HEURISTIC DISCIPLINE STREAK MONITOR
+        function calculateStreaks() {
+            let matchingDaysCount = 0;
+            Object.keys(appDb).forEach(d => {
+                const data = appDb[d];
+                // Check if user actively used the day's minimum target features
+                if (data.water >= 64 || data.coreChecked[0] || data.coreChecked[1] || data.sleep > 0) {
+                    matchingDaysCount++;
+                }
+            });
+            streakCount = matchingDaysCount;
+            document.getElementById('streak-counter').innerText = streakCount + (streakCount === 1 ? " Day" : " Days");
+        }
+
+        // Persist user edits and selections, including inputs inside dynamically rendered panels.
+        document.addEventListener('input', () => setTimeout(saveData, 0));
+        document.addEventListener('change', () => setTimeout(saveData, 0));
+        document.addEventListener('click', () => setTimeout(saveData, 0));
+        // Boot Pipeline
+        loadSavedData();
+        renderActiveDay();
+        calculateStreaks();
+        renderArchives();
+        if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+          window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.warn));
+        }
+    </script>
+</body>
+</html>
